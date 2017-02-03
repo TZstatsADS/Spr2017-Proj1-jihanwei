@@ -1,4 +1,4 @@
----
+.---
 title: ''
 output:
   html_document: default
@@ -8,7 +8,7 @@ output:
 >#**What did they say? How did they say? Is Trump an alien?**
 <center>Author: Jihan wei</center>  \n
 
-![US.Presidents](./figs/Presidents.jpg) \n  
+![US.Presidents](../figs/Presidents.jpg) \n  
 ---
 <font size=3>
 The inauguration speech is treated as one of the most important speeches for U.S. Presidents. In this project, we applied texting mining techniques to explore what they said during their inauguration speech, what strategies they adopted, and what kind of emotion they intended to convey. Intriguingly, we identified a significant trend on their speaking strategy and interesting clusters of their topics.   
@@ -136,7 +136,7 @@ beeswarm(sen_length,col=rainbow(58),pch=19,
 \n
 The beeswarm plot indicates that from George Washington, presidents tend to use shorter sentences in their inauguration speech. \n
 
-What°Øs the interpretation? As we know:  \n
+What‚Äôs the interpretation? As we know:  \n
 \n
 
 >**Shorter sentences are easier to follow**</center> \n
@@ -159,7 +159,7 @@ beeswarm(ex1,col=rainbow(8),pch=19,
 \n
 Based on the historical trend, we explore the contemporary era and focus on Donald Trump(58).
 ```{r,warning=FALSE}
-###µ±¥˙
+###ÂΩì‰ª£
 ex2<-sen_length[50:58]
 beeswarm(ex2,col=rainbow(8),pch=19, 
          method="hex", cex=0.8, horizontal=TRUE, 
@@ -167,7 +167,7 @@ beeswarm(ex2,col=rainbow(8),pch=19,
          main="Distribution of Sentence Length")
 ```
 \n
-From the above picture, we can°Øt detect significant difference between Trump and other presidents.  \n
+From the above picture, we can‚Äôt detect significant difference between Trump and other presidents.  \n
 
 ####**Part 1 Conclusion:**  
 \n
@@ -237,7 +237,7 @@ I set the topic numbers to be 10 and I manually tag them as "Patriotism", "Liber
 <center>![10 Topics](./figs/topics.png)</center>
 \n
 
-For example, I manually set Topic 1 as °∞Patriotism°± for the keywords: Nation, Duty, Patriot. And I tag topic 2 as °∞Liberty°±, since it contains keywords: People, Freedom, Right, Liberty; I tag Topic 3 as °∞Government°±, since it contains keywords like: Govern, Law, Congress, Secure; I tag Topic 9 as °∞ForeignPolicy°± for the keywords: War, Nation, Peace, Import. Moreover, I tag Topic 14 as °∞Unity°± for the keywords: One, Union, People, Can, State. 
+For example, I manually set Topic 1 as ‚ÄúPatriotism‚Äù for the keywords: Nation, Duty, Patriot. And I tag topic 2 as ‚ÄúLiberty‚Äù, since it contains keywords: People, Freedom, Right, Liberty; I tag Topic 3 as ‚ÄúGovernment‚Äù, since it contains keywords like: Govern, Law, Congress, Secure; I tag Topic 9 as ‚ÄúForeignPolicy‚Äù for the keywords: War, Nation, Peace, Import. Moreover, I tag Topic 14 as ‚ÄúUnity‚Äù for the keywords: One, Union, People, Can, State. 
 ```{r}
 topics.hash<-c("Patriotism","Liberty","America","Economy","WorkingFamilies", "Greetings","History", "ForeignPolicy", "Government","Unity")
 ldatopic<-as.vector(ldaOut.topics)
@@ -263,13 +263,13 @@ Note that red color indicates more weights on that topic. From the heatmap, we i
 
 
 ####**Interpretation:**
-We add reference lines to indicate different era. We can see, before 1860,which is the early years of the new American nation, presidents talked more about  °∞Unity°±, °∞Government°± and °∞Patriotism°±. It reveals that in that period, presidents wanted to show the power of government and unify people to contribute to the new country. 
+We add reference lines to indicate different era. We can see, before 1860,which is the early years of the new American nation, presidents talked more about  ‚ÄúUnity‚Äù, ‚ÄúGovernment‚Äù and ‚ÄúPatriotism‚Äù. It reveals that in that period, presidents wanted to show the power of government and unify people to contribute to the new country. 
 
-Between 1860 to1945, which is the period of American Civil War and the world wars, presidents tended to focus more on °∞Economy°±. This is reasonable since after several wars (especially after the Civil War), developing economy is the most urgent task.
+Between 1860 to1945, which is the period of American Civil War and the world wars, presidents tended to focus more on ‚ÄúEconomy‚Äù. This is reasonable since after several wars (especially after the Civil War), developing economy is the most urgent task.
 
-And from 1945 to 1968, which is treated as the Post-war period, presidents needed to develop the economy and establish good diplomatic relationships, thus they talked more about °∞Economy°± and °∞Foreign Policy°±. 
+And from 1945 to 1968, which is treated as the Post-war period, presidents needed to develop the economy and establish good diplomatic relationships, thus they talked more about ‚ÄúEconomy‚Äù and ‚ÄúForeign Policy‚Äù. 
 
-As for during the contemporary era, after severe problems have been released, presidents put their emphasis on individuals and even focus more the spiritual level so they usually talked about °∞Liberty°±, °∞America°± and °∞Working Families°±. Moreover, they tend to focus on working families to gain more support.    
+As for during the contemporary era, after severe problems have been released, presidents put their emphasis on individuals and even focus more the spiritual level so they usually talked about ‚ÄúLiberty‚Äù, ‚ÄúAmerica‚Äù and ‚ÄúWorking Families‚Äù. Moreover, they tend to focus on working families to gain more support.    
 
 >**In all, we believe what they say can indicate what challenge America is faced.**</center> \n 
 \n
@@ -290,7 +290,7 @@ From the plot, we can see, the K-mean clustering provide support for our interpr
 
 >**Contemporaneous presidents are clustered in same group**</center> \n
 
-This means that during different historical periods, America is faced with different challenges and presidents Inauguration speech will talk more about those challenges. We can gain information about current situations about America from president°Øs speech. 
+This means that during different historical periods, America is faced with different challenges and presidents Inauguration speech will talk more about those challenges. We can gain information about current situations about America from president‚Äôs speech. 
 
 Now,let's have a further analysis.
 ```{r}
@@ -298,7 +298,7 @@ fit$cluster
 fit$cluster[58]
 ```
 \n
-We see that cluster 3 mainly contains the contemporary presidents, and Trump is assigned to that Group. We may conclude that Trump doesn°Øt deviate a lot from the main topics of current America. Within the basic structure, Trump may have his own trait. Now, let°Øs have a look at what Trump said:
+We see that cluster 3 mainly contains the contemporary presidents, and Trump is assigned to that Group. We may conclude that Trump doesn‚Äôt deviate a lot from the main topics of current America. Within the basic structure, Trump may have his own trait. Now, let‚Äôs have a look at what Trump said:
 ```{r,warnings=FALSE,}
 docs2<-Corpus(VectorSource(unlist(text.list)))
 docs2<-tm_map(docs2, stripWhitespace)
@@ -312,14 +312,14 @@ wordcloud(ff.dtm2$term[ff.dtm2$document==58],ff.dtm2$count[ff.dtm2$document==58]
           max.words=100, random.order=FALSE, rot.per=.15, colors=brewer.pal(8,"Dark2"))
 ```
 \n
-The most significant words are °∞America°±, °∞Borders°±, °±Protection°±, °∞Dreams°± and °∞Everyone°±. \n
+The most significant words are ‚ÄúAmerica‚Äù, ‚ÄúBorders‚Äù, ‚ÄùProtection‚Äù, ‚ÄúDreams‚Äù and ‚ÄúEveryone‚Äù. \n
 
 ####**Part 2 Conclusion:**  
-From the topic modelling, we conclude that inauguration speech can reveal the problems that American was faced and can indicate the emphasis of the president°Øs policy. 
+From the topic modelling, we conclude that inauguration speech can reveal the problems that American was faced and can indicate the emphasis of the president‚Äôs policy. 
 
-For Trump, as one of the controversial president, he doesn°Øt make himself so different in term of the topics. While the key words show that he may focus more on focus more on:\n
+For Trump, as one of the controversial president, he doesn‚Äôt make himself so different in term of the topics. While the key words show that he may focus more on focus more on:\n
 
->**protectionism, nationalism and °∞tried°± to °∞protect°± °∞America°± and each American individual. ** \n 
+>**protectionism, nationalism and ‚Äútried‚Äù to ‚Äúprotect‚Äù ‚ÄúAmerica‚Äù and each American individual. ** \n 
 
 <center>![Trump2](./figs/Trump2.jpg)</center> \n \n
 
@@ -329,7 +329,7 @@ For Trump, as one of the controversial president, he doesn°Øt make himself so di
 
 Apart from the topics and sentence lengths, we also want to know what kind of emotions they wanted to convey during their speech. Therefore, we conducted the sentiment analysis to identify the emotion contained in each sentence of their speeches. \n
 
-We incorporate °∞trust°±£¨°∞disgust°±£¨°∞surprise°±£¨°∞sadness°±£¨°∞fear°±, °∞joy°±, and °∞anticipation°±as emotional categories. Based on the result for each sentence, we summarize them and plot the heat map to see the weights for different emotion. \n
+We incorporate ‚Äútrust‚ÄùÔºå‚Äúdisgust‚ÄùÔºå‚Äúsurprise‚ÄùÔºå‚Äúsadness‚ÄùÔºå‚Äúfear‚Äù, ‚Äújoy‚Äù, and ‚Äúanticipation‚Äùas emotional categories. Based on the result for each sentence, we summarize them and plot the heat map to see the weights for different emotion. \n
 ```{r,warnings=FALSE,echo=FALSE,error=FALSE}
 ##bulit functions to obtainin the emotion
 emotion.get<-function(text) {
@@ -361,13 +361,13 @@ The above graph indicates that, different from the weight allocation of topics, 
 
 >**Yes! The presidents want to convey a positive emotion to the public.**  \n
 
-Now, it could be interesting to see who is the most °∞negative°± president. \n
+Now, it could be interesting to see who is the most ‚Äúnegative‚Äù president. \n
 ```{r,warnings=FALSE}
 n<-which.max(data.frame(emotion.total)$negative)
 order[n]
 ```
 \n
-It°Øs William Henry Harrison! You could find it understandable once you know more about his stormy life experience and the fact that he is the °∞shortest-life°± president in American history. \n
+It‚Äôs William Henry Harrison! You could find it understandable once you know more about his stormy life experience and the fact that he is the ‚Äúshortest-life‚Äù president in American history. \n
 \n
 
 Generally, all presidents adopted a positive attitude during their speech. But, further analyses indicate that the flow of the emotion are different: some are moderate, some are more passionate. We can make the stack plot to further explore it. 
@@ -409,9 +409,9 @@ From the stack plot of several selected presidents, we can see, for John Tyler, 
 
 > ##What do we get?
 
-* In all, presidents tend to use more shorter sentences in their speech to interest people and to build a down-to earth image; Their speech topics cluster according to different historical era, which provides valuable information about national conditions of America. Moreover, nearly all of them adopt a positive attitude in their speech and focus on °∞Trust°± heavily, and this reveals the nature of the inauguration speech.  \n
+* In all, presidents tend to use more shorter sentences in their speech to interest people and to build a down-to earth image; Their speech topics cluster according to different historical era, which provides valuable information about national conditions of America. Moreover, nearly all of them adopt a positive attitude in their speech and focus on ‚ÄúTrust‚Äù heavily, and this reveals the nature of the inauguration speech.  \n
 
-* As for Trump, although interesting differences exist, we can°Øt treat his as an alien president based on the speech analysis. After all, that they do is much more important than what he say.  \n
+* As for Trump, although interesting differences exist, we can‚Äôt treat his as an alien president based on the speech analysis. After all, that they do is much more important than what he say.  \n
 
 
 * Is Trump an alien? Maybe time will tell us. \n </front>
