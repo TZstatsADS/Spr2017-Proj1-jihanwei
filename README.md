@@ -8,7 +8,7 @@
 Term: Spring 2017
 
 + Projec title: 
-####U.S. Presidents：--What did they say? How did they say? Is Trump an alien?
+**U.S. Presidents：--What did they say? How did they say? Is Trump an alien?**
 + This project is conducted by Jihan Wei
 + Project summary: 
 The inauguration speech is treated as one of the most important speeches for U.S. Presidents. In this project, we applied texting mining techniques to explore what they said during their inauguration speech, what strategies they adopted, and what kind of emotion they intended to convey. Intriguingly, we identified a significant trend on their speaking strategy and interesting clusters of their topics.   
