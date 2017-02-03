@@ -1,0 +1,448 @@
+---
+title: ''
+output:
+  html_document: default
+  html_notebook: default
+  pdf_document: default
+---
+```{r,echo=FALSE}
+#set path for data file
+#setwd("C:/Users/Jihan Wei/Desktop/Project 1")
+```
+>#**U.S. Presidents:**
+>#**What did they say? How did they say? Is Trump an alien?**
+<center>Author: Jihan wei</center>  \n
+
+![US.Presidents](./figs/Presidents.jpg) \n  
+---
+<font size=3>
+The inauguration speech is treated as one of the most important speeches for U.S. Presidents. In this project, we applied texting mining techniques to explore what they said during their inauguration speech, what strategies they adopted, and what kind of emotion they intended to convey. Intriguingly, we identified a significant trend on their speaking strategy and interesting clusters of their topics.   
+
+Once we related their topics with the America history, we can obtain more inspiration. And based on the analysis of all the presidents, we also treated Trump as our interest to check whether he is alien in the American history. 
+
+```{r,warning=FALSE,error=FALSE,echo=FALSE}
+##Fisrstly, we check all needed packages and configurate the enviroment.
+########install packages and  enviromnet cofiguration
+packages.used=c("rvest", "tibble", "qdap", "ggplot2",
+                "sentimentr", "gplots", "dplyr","gcookbook",
+                "tm", "syuzhet", "factoextra", "scales", "RColorBrewer","wordcloud",
+                "RANN", "tm", "topicmodels","beeswarm","cluster","tidytext")
+
+# check packages that need to be installed.
+packages.needed=setdiff(packages.used, 
+                        intersect(installed.packages()[,1], 
+                                  packages.used))
+# install additional packages
+if(length(packages.needed)>0){
+  install.packages(packages.needed, dependencies = TRUE)
+}
+
+#Configerate JAVA_Home
+Sys.setenv(JAVA_HOME='C:/Program Files/Java/jre1.8.0_121')
+
+# load packages
+library("rvest")
+library("tibble")
+library("qdap")
+library("sentimentr")
+library("gplots")
+library("dplyr")
+library("tm")
+library("syuzhet")
+library("factoextra")
+library("scales")
+library("RColorBrewer")
+library("RANN")
+library("tm")
+library("topicmodels")
+library("beeswarm")
+library("cluster") 
+library("tidytext")
+library("wordcloud")
+library("RColorBrewer")
+library("ggplot2")
+library("gcookbook")
+```
+
+---
+
+##Part 1: Sentence Analysis: \n
+
+Starting from the easiest method, we analyze the number and length of sentences for each president to identify interesting trend.
+```{r,warning=FALSE,include=FALSE,echo=FALSE}
+######Preparetion,Data Loading and Preliminary Analysis######
+folder.path="./data/InauguralSpeeches/"
+
+#Load Information and get order of president according to time
+require(xlsx)
+inau_infor<-read.xlsx("./data/InauguralSpeeches/InaugurationInfo.xlsx", sheetName = "Sheet1")
+order<-paste(inau_infor$File,"-",inau_infor$Term,sep= "")   
+
+#Get all txt files and load them 
+speeches=list.files(path = folder.path, pattern = "*.txt")
+n<-length(speeches)
+prez.out=substr(speeches, 6, nchar(speeches)-4)
+
+text.list<-NULL
+for (i in speeches){
+  New_file<-paste(scan(paste(folder.path,i,sep = ""),what = "character"),collapse=" ")
+  text.list<-rbind(text.list,New_file) 
+}
+rownames(text.list)<-prez.out
+
+#reorder the matrix according to time sequence:
+text.list<-data.frame(text.list[sapply(order,grep,prez.out),1])
+rownames(text.list)<-order
+```
+
+
+```{r,warning=FALSE,echo=FALSE}
+#####Convert Paragraph to Sentences######
+
+#Write function to get get word.cound for each senences:
+sentence.get<-function(text) {
+  sentences=sent_detect(text,
+                        endmarks = c("?", ".", "!", "|",";"))
+  
+  if(length(sentences)>0){
+    word.count=word_count(sentences)
+  }
+  return(word.count)
+}
+
+##get sentences for each speeach
+sen_length<-apply(text.list,1,sentence.get)
+
+##Use Precidency index to indicate the precident (for the clearer)
+names(sen_length)<-c(1:58)
+```
+For the clear structure of our following analysis, we represent each president by the index of term rather than their name. And we refer to the following table to get the president name for necessary interpretation.
+```{r}
+tables<-as.matrix(order)
+colnames(tables)<-c("President Name")
+rownames(tables)<-c(1:58)
+tables
+```
+\n
+Then, we use plot to show the trend:
+```{r,warning=FALSE}
+beeswarm(sen_length,col=rainbow(58),pch=19, 
+         method="hex", cex=0.5, horizontal=TRUE, 
+         xlab="Sentence Length", ylab="Precidency Index", 
+         main="Distribution of Sentence Length")
+```
+<font color=white>111</font> \n
+
+The beeswarm plot indicates that from George Washington, presidents tend to use shorter sentences in their inauguration speech. \n
+
+What¡¯s the interpretation? As we know:  \n
+\n
+
+>**Shorter sentences are easier to follow**</center> \n
+
+>**Shorter sentences make more sense**</center>   \n
+
+>**Shorter sentences indicate approachability**</center>   \n
+
+\n
+That is, they focus more on the communication with the public. They try to make sure that the public understand what they indent to convey and build a down-to-earth image. Then we select several famous presidents in different historical period: George Washington(1), John Tyler(14) Abraham Lincoln(19) Franklin D. Roosevelt (38), John F. Kennedy (44) and Barack Obama (56) to make comparision.  The trend is evident. 
+```{r,warning=FALSE}
+
+#
+ex1<-sen_length[c(1,14,19,38,44,56)]
+beeswarm(ex1,col=rainbow(8),pch=19, 
+         method="hex", cex=0.8, horizontal=TRUE, 
+         xlab="Sentence Length", ylab="Precidency Index", 
+         main="Distribution of Sentence Length")
+```
+<font color=white>111</font> \n
+
+Based on the historical trend, we explore the contemporary era and focus on Donald Trump(58).
+```{r,warning=FALSE}
+###µ±´ú
+ex2<-sen_length[50:58]
+beeswarm(ex2,col=rainbow(8),pch=19, 
+         method="hex", cex=0.8, horizontal=TRUE, 
+         xlab="Sentence Length", ylab="Precidency Index", 
+         main="Distribution of Sentence Length")
+```  
+<font color=white>111</font> \n
+
+From the above picture, we can¡¯t detect significant difference between Trump and other presidents.  \n
+
+####**Part 1 Conclusion:**  
+\n
+Presidents tend to use more shorter sentences to keep effective communication between them and the public. In terms of this, Trump is not heterogeneous and adopt the same speaking strategy.
+
+<center>![Trump1](./figs/Trump1.jpg)</center>
+---
+
+
+##Part 2: Topic Modelling  \n
+
+###2.1: Topic Allocation  \n
+
+Besides how they give a speech, we may be also curious about what they say. Moreover, we are interested in how indicative their topics is to reveal the current situation of America. In part 2, we adopt topic modeling method to explore their speech topics and the weights on each topic for each president.
+```{r,warning=FALSE,echo=FALSE}
+########Pre-processing the data#####
+
+
+###we build the corup using our text.list 
+docs<-Corpus(VectorSource(unlist(text.list)))
+#remove potentially problematic symbols
+docs <-tm_map(docs,content_transformer(tolower))
+#remove punctuation
+docs <- tm_map(docs, removePunctuation)
+#Strip digits
+docs <- tm_map(docs, removeNumbers)
+#remove stopwords
+docs <- tm_map(docs, removeWords, stopwords("english"))
+#remove whitespace
+docs <- tm_map(docs, stripWhitespace)
+#Stem document
+docs <- tm_map(docs,stemDocument)
+dtm <- DocumentTermMatrix(docs)
+
+
+#####Topic Modelling by the LDA method#####
+
+burnin <- 4000
+iter <- 2000
+thin <- 500
+seed <-list(2003,5,63,100001,765)
+nstart <- 5
+best <- TRUE
+#Number of topics
+k <- 10
+#Run LDA using Gibbs sampling
+ldaOut <-LDA(dtm, k, method="Gibbs", control=list(nstart=nstart, 
+                                                  seed = seed, best=best,
+                                                  burnin = burnin, iter = iter, 
+                                                  thin=thin))
+ldaOut.topics <- as.matrix(topics(ldaOut))
+ldaOut.terms <- as.matrix(terms(ldaOut,20))
+topicProbabilities <- as.data.frame(ldaOut@gamma)
+write.csv(topicProbabilities,file=paste("./TopicProbabilities1.csv"))
+terms.beta=ldaOut@beta
+terms.beta=scale(terms.beta)
+topics.terms=NULL
+for(i in 1:k){
+  topics.terms=rbind(topics.terms, ldaOut@terms[order(terms.beta[i,], decreasing = TRUE)[1:7]])
+}
+#topics.terms
+#ldaOut.terms
+```
+\n
+I set the topic numbers to be 10 and I manually tag them as "Patriotism", "Liberty", "America", "Economy", "History", "WorkingFamilies","Greetings","ForeignPolicy", "Government" and "Unity" after analyzing the keywords for each topic. \n
+
+<center>![10 Topics](./figs/topics.png)</center>
+\n
+
+For example, I manually set Topic 1 as ¡°Patriotism¡± for the keywords: Nation, Duty, Patriot. And I tag topic 2 as ¡°Liberty¡±, since it contains keywords: People, Freedom, Right, Liberty; I tag Topic 3 as ¡°Government¡±, since it contains keywords like: Govern, Law, Congress, Secure; I tag Topic 9 as ¡°ForeignPolicy¡± for the keywords: War, Nation, Peace, Import. Moreover, I tag Topic 14 as ¡°Unity¡± for the keywords: One, Union, People, Can, State. 
+```{r}
+topics.hash<-c("Patriotism","Liberty","America","Economy","WorkingFamilies", "Greetings","History", "ForeignPolicy", "Government","Unity")
+ldatopic<-as.vector(ldaOut.topics)
+ldahash<-topics.hash[ldaOut.topics]
+colnames(topicProbabilities)<-topics.hash
+```
+\n
+Then, I use heatmap plot to see the weight allocation of topics for each president. And an indicative trend appears. 
+```{r,warning=FALSE,echo=FALSE}
+heatmap.2(as.matrix(topicProbabilities), Rowv = FALSE,
+          scale = "column", key=T, 
+          col = bluered(60),
+          cexRow = 0.9, cexCol = 0.9, margins = c(8, 8),
+          trace = "none", density.info = "none")
+abline(h=0.56,col="Blue",lwd=2)
+abline(h=0.415,col="Cyan",lwd=2)
+abline(h=0.32,col="Green",lwd=2)
+abline(h=0.08,col="Yellow",lwd=2)
+legend("topright",legend=c("Before 1860","1860 To 1945","1945 To 1968","1968 To Present"),lty = 1,col=c("Blue","Cyan","Green","Yellow"))
+```
+<font color=white>111</font> \n
+
+Note that red color indicates more weights on that topic. From the heatmap, we identify interesting trend: presidents that in same era tends to have similar weight allocation among the topics. And when relating them with the America history, the results are not spurring and even indicative. 
+
+
+####**Interpretation:**
+We add reference lines to indicate different era. We can see, before 1860,which is the early years of the new American nation, presidents talked more about  ¡°Unity¡±, ¡°Government¡± and ¡°Patriotism¡±. It reveals that in that period, presidents wanted to show the power of government and unify people to contribute to the new country. 
+
+Between 1860 to1945, which is the period of American Civil War and the world wars, presidents tended to focus more on ¡°Economy¡±. This is reasonable since after several wars (especially after the Civil War), developing economy is the most urgent task.
+
+And from 1945 to 1968, which is treated as the Post-war period, presidents needed to develop the economy and establish good diplomatic relationships, thus they talked more about ¡°Economy¡± and ¡°Foreign Policy¡±. 
+
+As for during the contemporary era, after severe problems have been released, presidents put their emphasis on individuals and even focus more the spiritual level so they usually talked about ¡°Liberty¡±, ¡°America¡± and ¡°Working Families¡±. Moreover, they tend to focus on working families to gain more support.    
+
+>**In all, we believe what they say can indicate what challenge America is faced.**</center> \n 
+\n
+
+
+###2.2: Clustering of presidents according to topics
+\n
+Suddenly coming to the above interpretation may be not convincing. In the part, we perform presidents clustering based on the topics to see whether our belief is correct. 
+```{r}
+####Clustering
+mydata<-as.matrix(topicProbabilities)
+fit <- kmeans(mydata,4,nstart=20)
+#fit$cluster[58]
+clusplot(mydata, fit$cluster, color=TRUE, shade=TRUE, labels=2,lines = 0,main="Cluster plot of Presidents According to Topics")
+```
+<font color=white>111</font> \n
+
+From the plot, we can see, the K-mean clustering provide support for our interpretation:   
+
+>**Contemporaneous presidents are clustered in same group**</center> \n
+
+This means that during different historical periods, America is faced with different challenges and presidents Inauguration speech will talk more about those challenges. We can gain information about current situations about America from president¡¯s speech. 
+
+Now,let's have a further analysis.
+```{r}
+fit$cluster
+fit$cluster[58]
+```
+\n
+We see that cluster 3 mainly contains the contemporary presidents, and Trump is assigned to that Group. We may conclude that Trump doesn¡¯t deviate a lot from the main topics of current America. Within the basic structure, Trump may have his own trait. Now, let¡¯s have a look at what Trump said:
+```{r,warnings=FALSE,}
+docs2<-Corpus(VectorSource(unlist(text.list)))
+docs2<-tm_map(docs2, stripWhitespace)
+docs2<-tm_map(docs2, content_transformer(tolower))
+docs2<-tm_map(docs2, removeWords, stopwords("english"))
+docs2<-tm_map(docs2, removeWords, character(0))
+docs2<-tm_map(docs2, removePunctuation)
+dtm2<- DocumentTermMatrix(docs2,control = list(weighting =function(x) weightTfIdf(x, normalize =FALSE),stopwords = TRUE))
+ff.dtm2<-tidy(dtm2)
+wordcloud(ff.dtm2$term[ff.dtm2$document==58],ff.dtm2$count[ff.dtm2$document==58], scale=c(2.5,.2),min.freq=2,
+          max.words=100, random.order=FALSE, rot.per=.15, colors=brewer.pal(8,"Dark2"))
+```
+<font color=white>111</font> \n
+
+The most significant words are ¡°America¡±, ¡°Borders¡±, ¡±Protection¡±, ¡°Dreams¡± and ¡°Everyone¡±. \n
+
+####**Part 2 Conclusion:**  
+From the topic modelling, we conclude that inauguration speech can reveal the problems that American was faced and can indicate the emphasis of the president¡¯s policy. 
+
+For Trump, as one of the controversial president, he doesn¡¯t make himself so different in term of the topics. While the key words show that he may focus more on focus more on:\n
+
+>**protectionism, nationalism and ¡°tried¡± to ¡°protect¡± ¡°America¡± and each American individual. ** \n 
+
+<center>![Trump2](./figs/Trump2.jpg)</center> \n \n
+
+---
+
+##Part 3: Sentiment Analysis \n
+
+Apart from the topics and sentence lengths, we also want to know what kind of emotions they wanted to convey during their speech. Therefore, we conducted the sentiment analysis to identify the emotion contained in each sentence of their speeches. \n
+
+We incorporate ¡°trust¡±£¬¡°disgust¡±£¬¡°surprise¡±£¬¡°sadness¡±£¬¡°fear¡±, ¡°joy¡±, and ¡°anticipation¡±as emotional categories. Based on the result for each sentence, we summarize them and plot the heat map to see the weights for different emotion. \n
+```{r,warnings=FALSE,echo=FALSE,error=FALSE}
+##bulit functions to obtainin the emotion
+emotion.get<-function(text) {
+  sentence.list<-NULL
+  sentences=sent_detect(text,
+                        endmarks = c("?", ".", "!", "|",";"))
+  if(length(sentences)>0){
+    word.count=word_count(sentences)
+    emotions=get_nrc_sentiment(sentences)
+    emotions=diag(1/(word.count+0.01))%*%as.matrix(emotions)
+  }
+  return(emotions)
+}
+
+emotion.list<-apply(text.list,1,emotion.get)
+names(emotion.list)<-c(1:58)
+
+emotion.total<-sapply(emotion.list,colSums,na.rm=T)
+emotion.total<-t(emotion.total)
+
+heatmap.2(emotion.total[,c(1:8)],
+          scale = "row", key=T, 
+          col = bluered(60),
+          cexRow = 0.9, cexCol = 0.9, margins = c(8, 8),
+          trace = "none", density.info = "none")
+```
+<font color=white>111</font> \n
+
+The above graph indicates that, different from the weight allocation of topics, nearly all the presidents convey more positive emotion like Trust, Joy and Anticipation. \n
+
+>**Yes! The presidents want to convey a positive emotion to the public.**  \n
+
+Now, it could be interesting to see who is the most ¡°negative¡± president. \n
+```{r,warnings=FALSE}
+n<-which.max(data.frame(emotion.total)$negative)
+order[n]
+```
+\n
+It¡¯s William Henry Harrison! You could find it understandable once you know more about his stormy life experience and the fact that he is the ¡°shortest-life¡± president in American history. \n
+\n
+
+Generally, all presidents adopted a positive attitude during their speech. But, further analyses indicate that the flow of the emotion are different: some are moderate, some are more passionate. We can make the stack plot to further explore it. 
+```{r,echo=FALSE,warnings=FALSE}
+##Write Function to get data suitble for ggplot2
+dataforplot<-function(x){
+  Target<-emotion.list[[x]][,c(1:8)]
+  Row_No<-nrow(Target) 
+  Col_Name<-colnames(Target)
+  type<-rep(Col_Name,Row_No)
+  senten<-rep(1:Row_No,each=8)
+  data_vector<-c(t(Target))
+  return(data.frame(y=data_vector,Sen_No=senten,sentiment=type))
+}
+
+
+data1<-dataforplot(x=1)
+ggplot(data1, aes(x=Sen_No,y=y,fill=sentiment)) + 
+  geom_area(aes(colour=sentiment),position="stack")+
+  labs(x = "Sentence Number",y="Indicator of Sentiment Level", title="Stack Plot for George Washington")
+
+data14<-dataforplot(x=14)
+  ggplot(data14[,], aes(x=Sen_No,y=y,fill=sentiment)) + 
+    geom_area(aes(colour=sentiment),position="stack")+
+    labs(x = "Sentence Number",y="Indicator of Sentiment Level", title="Stack Plot for John Tyler")
+  
+data56<-dataforplot(x=56)
+  ggplot(data56, aes(x=Sen_No,y=y,fill=sentiment)) + 
+    geom_area(aes(colour=sentiment),position="stack")+
+    labs(x = "Sentence Number",y="Indicator of Sentiment Level", title="Stack Plot for Barack Obama")
+  
+data58<-dataforplot(x=58)
+  ggplot(data58, aes(x=Sen_No,y=y,fill=sentiment)) + 
+    geom_area(aes(colour=sentiment),position="stack")+
+    labs(x = "Sentence Number",y="Indicator of Sentiment Level", title="Stack Plot for Donald Trump")
+```
+<font color=white>111</font> \n
+
+From the stack plot of several selected presidents, we can see, for John Tyler, there are few fluctuations of emotion from sentence to sentence. However, for Obama, who is often treated as an excellent orator, he is more spirited and full of emotional fluctuations. As for Trump, he has his own way of speaking: he kept relatively placid at the beginning and tried to kindle people in the end.  \n
+
+> ##What do we get?
+
+* In all, presidents tend to use more shorter sentences in their speech to interest people and to build a down-to earth image; Their speech topics cluster according to different historical era, which provides valuable information about national conditions of America. Moreover, nearly all of them adopt a positive attitude in their speech and focus on ¡°Trust¡± heavily, and this reveals the nature of the inauguration speech.  \n
+
+* As for Trump, although interesting differences exist, we can¡¯t treat his as an alien president based on the speech analysis. After all, that they do is much more important than what he say.  \n
+
+
+* Is Trump an alien? Maybe time will tell us. \n </front>
+
+---
+<font size=1.5>
+**Reference:**  \n  
+
+1. US.Presidents: From<https://www.google.com/search?q=%E7%BE%8E%E5%9B%BD%E5%8E%86%E5%8F%B2%E6%80%BB%E7%BB%9F&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiWxY6puOzRAhXNdSYKHb96D44Q_AUICSgC&biw=1563&bih=892>   \n
+
+2. Trump1: From<https://www.google.com/search?q=TRUMP+CARTOON&biw=1563&bih=892&source=lnms&tbm=isch&sa=X&ved=0ahUKEwjUo43k0-zRAhWFJCYKHcIFBlgQ_AUIBigB>  \n
+
+3. Trump2: From<https://www.google.com/search?q=%E7%BE%8E%E5%9B%BD%E5%8E%86%E5%8F%B2%E6%80%BB%E7%BB%9F&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiWxY6puOzRAhXNdSYKHb96D44Q_AUICSgC&biw=1563&bih=892> </front>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
